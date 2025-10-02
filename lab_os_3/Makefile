@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra
-TARGET = lab3_program
+TARGET = lab3
 
 all: $(TARGET)
 
