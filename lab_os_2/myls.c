@@ -159,9 +159,9 @@ void list_dir(const char *path, int print_header, int multi) {
             printf("%s%s%s\n", c, v[i].name, r);
         }
     } else {
-        long long blocks = 0;                 // st_blocks — в 512Б блоках
+        long long blocks = 0;               
         for (size_t i=0;i<n;i++) if (v[i].ok) blocks += (long long)v[i].st.st_blocks;
-        printf("total %lld\n", blocks / 2);   // печатаем в «килоблоках» как GNU ls
+        printf("total %lld\n", blocks / 2);   
 
         int w_links=1, w_owner=1, w_group=1, w_size=1;
         for (size_t i=0;i<n;i++) if (v[i].ok) {
@@ -248,7 +248,7 @@ int main(int argc, char **argv) {
 
     for (int i=0;i<narg;i++) isdir[i] = path_is_dir(argv[optind+i]);
 
-    for (int i=0;i<narg;i++) { // сначала файлы/ошибки
+    for (int i=0;i<narg;i++) {
         const char *p = argv[optind+i];
         struct stat st;
         if (lstat(p, &st)==0 && !S_ISDIR(st.st_mode)) {
@@ -258,7 +258,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    for (int i=0;i<narg;i++) { // потом каталоги
+    for (int i=0;i<narg;i++) { 
         if (isdir[i]) {
             list_dir(argv[optind+i], 1, narg>1);
             if (i != narg-1) printf("\n");
