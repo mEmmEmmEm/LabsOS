@@ -208,7 +208,7 @@ void list_dir(const char *path, int print_header, int multi) {
             if (S_ISLNK(st->st_mode)) {
                 char target[PATH_MAX];
                 ssize_t k = readlink(v[i].full, target, sizeof(target)-1);
-                if (k >= 0) target[k]='\0'; else strcpy(target, "?");
+                if (k >= 0) target[k]='\0'; else strcpy(target, "uid");
                 printf("%s%s%s -> %s\n", c, v[i].name, r, target);
             } else {
                 printf("%s%s%s\n", c, v[i].name, r);
