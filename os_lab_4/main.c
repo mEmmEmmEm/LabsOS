@@ -17,7 +17,7 @@ static void usage(const char *p) {
         "  %s g+rw file.txt\n"
         "  %s ug+rw file.txt\n"
         "  %s uga+rwx file.txt\n"
-        "  %s 766 file.txt\n", p, p, p, p, p, p);
+        "  %s 766 file.txt\n", p, p, p, p, p, p, p);
 }
 
 static int is_octal(const char *s) {
