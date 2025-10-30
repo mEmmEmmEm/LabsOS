@@ -2,7 +2,7 @@ CC := gcc
 CFLAGS := -std=c17 -Wall -Wextra -O2
 
 all: mychmod
-mychmod: mychmod.c
+mychmod: main.c
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
