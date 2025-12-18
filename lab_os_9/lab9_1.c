@@ -10,6 +10,7 @@ char buffer[BUF_SIZE];
 sem_t sem;
 
 void* writer_thread(void* arg) {
+    (void)arg;
     int counter = 1;
 
     while (1) {
@@ -24,6 +25,7 @@ void* writer_thread(void* arg) {
 }
 
 void* reader_thread(void* arg) {
+    (void)arg;
     pthread_t tid = pthread_self();
 
     while (1) {
