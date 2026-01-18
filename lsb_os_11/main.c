@@ -9,36 +9,28 @@
 static char shared_array[BUFFER_SIZE] = "Empty";
 
 static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t cv_readers = PTHREAD_COND_INITIALIZER;
-static pthread_cond_t cv_writer = PTHREAD_COND_INITIALIZER;
+static pthread_cond_t  cv  = PTHREAD_COND_INITIALIZER;
 
 static int generation = 0;
-static int readers_seen = 0;
-static int data_ready = 0;
 static int keep_running = 1;
 
 static void* writer_thread(void* arg) {
     (void)arg;
+    int counter = 0;
 
     while (1) {
         pthread_mutex_lock(&mtx);
-
-        while (keep_running && data_ready) {
-            pthread_cond_wait(&cv_writer, &mtx);
-        }
 
         if (!keep_running) {
             pthread_mutex_unlock(&mtx);
             break;
         }
 
+        counter++;
         generation++;
-        readers_seen = 0;
-        data_ready = 1;
+        snprintf(shared_array, BUFFER_SIZE, "Record #%d", counter);
+        pthread_cond_broadcast(&cv);
 
-        snprintf(shared_array, BUFFER_SIZE, "Record #%d", generation);
-
-        pthread_cond_broadcast(&cv_readers);
         pthread_mutex_unlock(&mtx);
 
         printf("[WRITER] wrote: %s\n", shared_array);
@@ -56,26 +48,17 @@ static void* reader_thread(void* arg) {
         char local[BUFFER_SIZE];
 
         pthread_mutex_lock(&mtx);
-
-        while (keep_running && (!data_ready || last_seen == generation)) {
-            pthread_cond_wait(&cv_readers, &mtx);
+        while (keep_running && last_seen == generation) {
+            pthread_cond_wait(&cv, &mtx);
         }
 
         if (!keep_running) {
             pthread_mutex_unlock(&mtx);
             break;
         }
-
         strncpy(local, shared_array, BUFFER_SIZE);
         local[BUFFER_SIZE - 1] = '\0';
-
         last_seen = generation;
-        readers_seen++;
-
-        if (readers_seen == NUM_READERS) {
-            data_ready = 0;
-            pthread_cond_signal(&cv_writer);
-        }
 
         pthread_mutex_unlock(&mtx);
 
@@ -104,18 +87,13 @@ int main(void) {
 
     pthread_mutex_lock(&mtx);
     keep_running = 0;
-    pthread_cond_broadcast(&cv_readers);
-    pthread_cond_broadcast(&cv_writer);
+    pthread_cond_broadcast(&cv);
     pthread_mutex_unlock(&mtx);
 
     pthread_join(writer, NULL);
     for (int i = 0; i < NUM_READERS; i++) {
         pthread_join(readers[i], NULL);
     }
-
-    pthread_mutex_destroy(&mtx);
-    pthread_cond_destroy(&cv_readers);
-    pthread_cond_destroy(&cv_writer);
 
     return 0;
 }
